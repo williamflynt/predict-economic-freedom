@@ -1,0 +1,28 @@
+{
+  "sources": [
+    {
+      "source": "Kaggle",
+      "url": "https://www.kaggle.com/datasets/sazidthe1/global-electricity-production",
+      "filename": "ElectricityProductionData.zip",
+      "comments": ""
+    },
+    {
+      "source": "Kaggle",
+      "url": "https://www.kaggle.com/datasets/kanchana1990/un-global-water-data-2012-2022",
+      "filename": "WaterData.zip",
+      "comments": ""
+    },
+    {
+      "source": "Kaggle",
+      "url": "https://www.kaggle.com/datasets/mlippo/freedom-economic-index",
+      "filename": "EconomicFreedomData.zip",
+      "comments": ""
+    },
+    {
+      "source": "Kaggle",
+      "url": "https://www.kaggle.com/code/sagarraturi/pandas-and-data-visualization/input",
+      "filename": "World Economy Freedom.zip",
+      "comments": ""
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# IDE and data.
+*.iml
+.idea/
+venv/
+data-raw/csv/
