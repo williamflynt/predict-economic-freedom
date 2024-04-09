@@ -13,7 +13,7 @@ MISSING_SENTINEL = np.nan
 COUNTRY = 0
 YEAR = 1
 WATER = 2
-ELEC = 4
+ELEC = 3
 
 
 def calculate_deltas(data: pd.DataFrame) -> dict:
@@ -92,7 +92,7 @@ def get_water_data() -> pd.DataFrame:
 
 
 def get_raw_features(water_data: pd.DataFrame, elec_data: pd.DataFrame) -> pd.DataFrame:
-    return water_data[["country_name", "year", "WS_PPL_W-SM", "WS_HCF_W-B"]].merge(
+    return water_data[["country_name", "year", "WS_PPL_W-SM"]].merge(
         elec_data[
             ["country_name", "year", "Net Electricity Production_Electricity_GWh"]
         ],
@@ -148,12 +148,46 @@ def get_final_features(
     ]
     feature_df.reset_index(inplace=True)
     feature_df.rename(columns={"index": "country_name"}, inplace=True)
-    # EXPORT
-    feature_df.to_csv(
-        ARTIFACT_DIR / "feature_df.csv", index=False, sep="\t", na_rep="NaN"
-    )
-    feature_df.describe()
     return feature_df
+
+
+def with_multiyear_deltas(data: pd.DataFrame) -> pd.DataFrame:
+    data["water_delta_10_yr"] = (
+        data["WS_PPL_W_SM_2022"] - data["WS_PPL_W_SM_2012"]
+    ) / data["WS_PPL_W_SM_2022"]
+    data["water_delta_5_yr"] = (
+        data["WS_PPL_W_SM_2022"] - data["WS_PPL_W_SM_2017"]
+    ) / data["WS_PPL_W_SM_2022"]
+    data["water_delta_4_yr"] = (
+        data["WS_PPL_W_SM_2022"] - data["WS_PPL_W_SM_2018"]
+    ) / data["WS_PPL_W_SM_2022"]
+    data["water_delta_3_yr"] = (
+        data["WS_PPL_W_SM_2022"] - data["WS_PPL_W_SM_2019"]
+    ) / data["WS_PPL_W_SM_2022"]
+    data["water_delta_2_yr"] = (
+        data["WS_PPL_W_SM_2022"] - data["WS_PPL_W_SM_2020"]
+    ) / data["WS_PPL_W_SM_2022"]
+    data["elec_delta_10_yr"] = (
+        data["Net_Electricity_Production_Electricity_GWh_2022"]
+        - data["WS_PPL_W_SM_2012"]
+    ) / data["Net_Electricity_Production_Electricity_GWh_2022"]
+    data["elec_delta_5_yr"] = (
+        data["Net_Electricity_Production_Electricity_GWh_2022"]
+        - data["Net_Electricity_Production_Electricity_GWh_2017"]
+    ) / data["Net_Electricity_Production_Electricity_GWh_2022"]
+    data["elec_delta_4_yr"] = (
+        data["Net_Electricity_Production_Electricity_GWh_2022"]
+        - data["Net_Electricity_Production_Electricity_GWh_2018"]
+    ) / data["Net_Electricity_Production_Electricity_GWh_2022"]
+    data["elec_delta_3_yr"] = (
+        data["Net_Electricity_Production_Electricity_GWh_2022"]
+        - data["Net_Electricity_Production_Electricity_GWh_2019"]
+    ) / data["Net_Electricity_Production_Electricity_GWh_2022"]
+    data["elec_delta_2_yr"] = (
+        data["Net_Electricity_Production_Electricity_GWh_2022"]
+        - data["Net_Electricity_Production_Electricity_GWh_2020"]
+    ) / data["Net_Electricity_Production_Electricity_GWh_2022"]
+    return data
 
 
 def join_targets(
@@ -163,15 +197,31 @@ def join_targets(
     target_cols: list = None,
 ) -> pd.DataFrame:
     if target_cols is None:
-        target_cols = ["2022 Score", "2023 Score", "Change from 2022"]
-    return features.merge(targets[[on] + target_cols], on=on, how="left")
+        target_cols = [
+            "Region",
+            "Govt Integrity",
+            "Gov't Spending",
+            "Tax Burden",
+            "2022 Score",
+            "2023 Score",
+            "Change from 2022",
+        ]
+    df = features.merge(targets[[on] + target_cols], on=on, how="left")
+    columns = {
+        col: "_".join(
+            [part for part in col.replace("'", "").replace("-", "_").split(" ")]
+        )
+        for col in df.columns
+    }
+    return df.rename(columns=columns)
 
 
 def get_dataset() -> pd.DataFrame:
     raw_features = get_raw_features(get_water_data(), get_elec_data())
     deltas_data = get_feature_deltas(raw_features)
     final_features = get_final_features(raw_features, deltas_data)
-    return join_targets(final_features, get_econ_data())
+    data = join_targets(final_features, get_econ_data())
+    return with_multiyear_deltas(data)
 
 
 if __name__ == "__main__":

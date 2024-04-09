@@ -1,0 +1,63 @@
+# Found formulas
+
+I found these through automated regression iteration.
+These select 1 param each from 4 categories.
+Then iterate on which params are included until all parameters are significant.
+
+The code (snippet):
+
+```
+combinations = list(
+    itertools.product(
+        water_single_deltas, elec_single_deltas, water_cols, elec_cols
+    )
+)
+for target in ["Change_from_2022", "Govt_Integrity"]:
+    for combo in combinations:
+        linear_model, linear_results = build_linear_econ_predictor(
+            data,
+            use_cols=list(combo),
+            predict=target,
+            prune_attempts=25,
+        )
+```
+
+Below are the models where all variables are significant.
+My interpretation is that they're nonsense.
+The output:
+
+```
+Change_from_2022 ~ water_delta_4_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2013:water_delta_4_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2013 + delta_WS_PPL_W_SM_2013:elec_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2013:elec_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2013:water_delta_4_yr + delta_Net_Electricity_Production_Electricity_GWh_2013:water_delta_4_yr:elec_delta_2_yr
+	all significant: True
+	adj_r2: 0.36264135816719933
+Change_from_2022 ~ delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_4_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_4_yr + water_delta_4_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_4_yr + delta_WS_PPL_W_SM_2013 + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_4_yr:elec_delta_4_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_4_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_4_yr:elec_delta_4_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014 + delta_Net_Electricity_Production_Electricity_GWh_2014
+	all significant: True
+	adj_r2: 0.3992440643913987
+Change_from_2022 ~ delta_WS_PPL_W_SM_2013:water_delta_4_yr:elec_delta_2_yr + water_delta_4_yr + delta_WS_PPL_W_SM_2013 + delta_Net_Electricity_Production_Electricity_GWh_2014 + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_4_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_4_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_4_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014
+	all significant: True
+	adj_r2: 0.4149307812183055
+Change_from_2022 ~ delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_3_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2013 + delta_WS_PPL_W_SM_2013:elec_delta_2_yr + water_delta_3_yr + delta_Net_Electricity_Production_Electricity_GWh_2014 + delta_WS_PPL_W_SM_2013:water_delta_3_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_3_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014
+	all significant: True
+	adj_r2: 0.462954846718744
+Change_from_2022 ~ delta_Net_Electricity_Production_Electricity_GWh_2013 + elec_delta_2_yr + water_delta_3_yr + delta_WS_PPL_W_SM_2014:delta_Net_Electricity_Production_Electricity_GWh_2013:water_delta_3_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2014:delta_Net_Electricity_Production_Electricity_GWh_2013 + delta_WS_PPL_W_SM_2014:water_delta_3_yr + water_delta_3_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2014:delta_Net_Electricity_Production_Electricity_GWh_2013:water_delta_3_yr + delta_Net_Electricity_Production_Electricity_GWh_2013:water_delta_3_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2014:elec_delta_2_yr + delta_WS_PPL_W_SM_2014:delta_Net_Electricity_Production_Electricity_GWh_2013:elec_delta_2_yr
+	all significant: True
+	adj_r2: 0.5890022102569096
+Change_from_2022 ~ delta_WS_PPL_W_SM_2016 + delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_2_yr + delta_WS_PPL_W_SM_2016:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr + delta_Net_Electricity_Production_Electricity_GWh_2014 + water_delta_10_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2016:water_delta_10_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2016:elec_delta_2_yr + delta_WS_PPL_W_SM_2016:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr:elec_delta_2_yr + delta_WS_PPL_W_SM_2016:delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_2_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr:elec_delta_2_yr
+	all significant: True
+	adj_r2: 0.610662348111922
+Govt_Integrity ~ water_delta_10_yr:elec_delta_5_yr + delta_WS_PPL_W_SM_2013:water_delta_10_yr:elec_delta_5_yr + elec_delta_5_yr + delta_Net_Electricity_Production_Electricity_GWh_2014 + water_delta_10_yr + delta_WS_PPL_W_SM_2013:water_delta_10_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr:elec_delta_5_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr:elec_delta_5_yr
+	all significant: True
+	adj_r2: 0.6327805062452561
+Govt_Integrity ~ delta_WS_PPL_W_SM_2013:elec_delta_10_yr + delta_WS_PPL_W_SM_2013 + delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_10_yr + delta_Net_Electricity_Production_Electricity_GWh_2014 + delta_WS_PPL_W_SM_2013:water_delta_2_yr:elec_delta_10_yr + delta_WS_PPL_W_SM_2013:water_delta_2_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr:elec_delta_10_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr:elec_delta_10_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr + delta_WS_PPL_W_SM_2013:delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_10_yr
+	all significant: True
+	adj_r2: 0.7146567995153814
+Govt_Integrity ~ delta_WS_PPL_W_SM_2015:elec_delta_10_yr + delta_WS_PPL_W_SM_2015 + delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_10_yr + delta_WS_PPL_W_SM_2015:water_delta_2_yr:elec_delta_10_yr + delta_WS_PPL_W_SM_2015:water_delta_2_yr + delta_Net_Electricity_Production_Electricity_GWh_2014 + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr:elec_delta_10_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr + delta_WS_PPL_W_SM_2015:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr:elec_delta_10_yr + delta_WS_PPL_W_SM_2015:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_2_yr + delta_WS_PPL_W_SM_2015:delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_10_yr
+	all significant: True
+	adj_r2: 0.747575342147365
+Govt_Integrity ~ delta_WS_PPL_W_SM_2022:delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr + delta_WS_PPL_W_SM_2022:elec_delta_4_yr + delta_WS_PPL_W_SM_2022:delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_4_yr + delta_WS_PPL_W_SM_2022:water_delta_10_yr:elec_delta_4_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr + delta_Net_Electricity_Production_Electricity_GWh_2014 + water_delta_10_yr:elec_delta_4_yr + delta_WS_PPL_W_SM_2022:delta_Net_Electricity_Production_Electricity_GWh_2014 + delta_Net_Electricity_Production_Electricity_GWh_2014:elec_delta_4_yr + delta_Net_Electricity_Production_Electricity_GWh_2014:water_delta_10_yr:elec_delta_4_yr + delta_WS_PPL_W_SM_2022
+	all significant: True
+	adj_r2: 0.7528874462964409
+Govt_Integrity ~ delta_WS_PPL_W_SM_2022:delta_Net_Electricity_Production_Electricity_GWh_2021:water_delta_10_yr:elec_delta_5_yr + delta_Net_Electricity_Production_Electricity_GWh_2021 + delta_WS_PPL_W_SM_2022:delta_Net_Electricity_Production_Electricity_GWh_2021 + delta_Net_Electricity_Production_Electricity_GWh_2021:water_delta_10_yr:elec_delta_5_yr + delta_Net_Electricity_Production_Electricity_GWh_2021:elec_delta_5_yr + delta_WS_PPL_W_SM_2022:elec_delta_5_yr + water_delta_10_yr:elec_delta_5_yr + delta_Net_Electricity_Production_Electricity_GWh_2021:water_delta_10_yr
+	all significant: True
+	adj_r2: 0.7760998980516117
+```
