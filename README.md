@@ -2,11 +2,34 @@
 
 #### Contents
 
+1. [Overview](#overview)
+2. [Local Development](#local-development)
+
 ---
+
+## Overview
+
+In this project, I present three poor models that were selected using exhaustive search. They do not hold up under any amount of inspection.
+
+![bad regression](./artifacts/Change_from_2022-Regression.png)
 
 ## Local Development
 
-Python 3.12
+I used Python 3.12, but you could probably use an older version.
+Here's a starter script for Linux.
+
+```sh
+# Create a virtual environment
+python3 -m venv ./venv
+
+# Activate the virtual environment
+source ./venv/bin/activate
+
+# Install the requirements
+pip install -r requirements.txt
+```
+
+Now you can run the notebook and code in `src/`.
 
 ---
 
