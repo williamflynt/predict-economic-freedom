@@ -3,3 +3,6 @@
 .idea/
 venv/
 data-raw/csv/
+
+# Presentation.
+.~lock*

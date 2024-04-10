@@ -11,7 +11,7 @@
     - Where from
     - What's in there
     - Why they might work for this - let's find out!
-* Exploratory Data Analysis (1 minute):
+* Exploratory Data Analysis (2 minutes):
     - Overview and findings about data
     - Visualization
 * Model Building and Iteration (2 minutes):

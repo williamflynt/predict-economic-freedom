@@ -79,3 +79,9 @@ FLEX TO DT for overall classification.
     - This was fine, but overall low `n` means hard to get a good model
     - tested for similar params, but models collapsed - not strong.
     - 85th percentile worked just fine...
+
+## 10 Apr 2024
+
+Backfilled data from newest year into oldest
+Updated models
+Did presentation
