@@ -9,6 +9,7 @@ from sklearn.metrics import (
     recall_score,
     f1_score,
     confusion_matrix,
+    roc_auc_score,
 )
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -18,7 +19,7 @@ from sklearn.tree import plot_tree
 from src.data import get_dataset, ARTIFACT_DIR
 from src.viz import plot_linear_regression
 
-IS_ECONOMICALLY_FREE_DEFAULT_THRESHOLD = 70  # p85
+IS_ECONOMICALLY_FREE_DEFAULT_THRESHOLD = 66  # p75
 
 
 def build_linear_econ_predictor(
@@ -32,7 +33,9 @@ def build_linear_econ_predictor(
     :return: tuple Fitted model and fit results.
     """
     if formula is None:
-        formula = "Change_from_2022 ~ water_delta_3_yr + water_delta_3_yr:elec_delta_3_yr + water_delta_3_yr:delta_Net_Electricity_Production_Electricity_GWh_2022"
+        # Below worked best before backfilling data.
+        # formula = "Change_from_2022 ~ water_delta_3_yr + water_delta_3_yr:elec_delta_3_yr + water_delta_3_yr:delta_Net_Electricity_Production_Electricity_GWh_2022"
+        formula = "Change_from_2022 ~ delta_WS_PPL_W_SM_2021:elec_delta_10_yr + delta_WS_PPL_W_SM_2021 + delta_WS_PPL_W_SM_2021:water_delta_10_yr:elec_delta_10_yr + delta_WS_PPL_W_SM_2021:water_delta_10_yr"
     model = smf.ols(formula=formula, data=data, missing="drop")
     results = model.fit()
     return model, results
@@ -41,7 +44,6 @@ def build_linear_econ_predictor(
 def build_econ_classifier(
     data: pd.DataFrame,
     threshold: int = IS_ECONOMICALLY_FREE_DEFAULT_THRESHOLD,
-    test_size: float = 0.2,
     print_results: bool = True,
 ) -> tuple[DecisionTreeClassifier, Any, dict[str, float | Any]]:
     """
@@ -55,11 +57,11 @@ def build_econ_classifier(
     """
     data["is_economically_free"] = (data["2023_Score"] > threshold).astype(int)
 
-    X = data[["water_delta_10_yr", "elec_delta_5_yr"]]
+    X = data[["delta_WS_PPL_W_SM_2022", "water_delta_10_yr", "elec_delta_5_yr"]]
     y = data["is_economically_free"]
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=0
+        X, y, test_size=0.2, random_state=0
     )
     clf = DecisionTreeClassifier(random_state=0)
     clf.fit(X_train, y_train)
@@ -69,6 +71,7 @@ def build_econ_classifier(
         "precision": precision_score(y_test, predictions),
         "recall": recall_score(y_test, predictions),
         "f1": f1_score(y_test, predictions),
+        "auc": roc_auc_score(y_test, predictions),
     }
 
     if print_results:
@@ -79,6 +82,7 @@ def build_econ_classifier(
         print("Precision:", f"{precision_score(y_test, predictions):.3f}")
         print("Recall   :", f"{recall_score(y_test, predictions):.3f}")
         print("F1 Score :", f"{f1_score(y_test, predictions):.3f}")
+        print("AUC      :", f"{roc_auc_score(y_test, predictions):.3f}")
         print("Confusion Matrix:\n", confusion_matrix(y_test, predictions))
 
     return clf, predictions, results
@@ -108,6 +112,10 @@ if __name__ == "__main__":
         filled=True,
         rounded=True,
         class_names=["Not Economically Free", "Economically Free"],
-        feature_names=["water_delta_10_yr", "elec_delta_5_yr"],
+        feature_names=[
+            "delta_WS_PPL_W_SM_2022",
+            "water_delta_10_yr",
+            "elec_delta_5_yr",
+        ],
     )
     plt.savefig(ARTIFACT_DIR / "DecisionTree.png")

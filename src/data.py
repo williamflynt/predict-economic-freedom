@@ -158,23 +158,17 @@ def fill_na_2022(data: pd.DataFrame) -> pd.DataFrame:
     :param data:
     :return:
     """
-    water_cols_to_fill = [
-        col
-        for col in data.columns
-        if col.startswith("WS_PPL") and not col.endswith("2022")
-    ]
-    for c in water_cols_to_fill:
-        data[c].fillna(data["WS_PPL_W_SM_2022"], inplace=True)
+    water_cols_to_fill = [col for col in data.columns if col.startswith("WS_PPL")]
+    water_cols_to_fill = list(reversed(water_cols_to_fill))  # Most recent first.
+    for i, c in enumerate(water_cols_to_fill[1:]):
+        # Backfill from present to past in a cascade.
+        data[c] = data[c].fillna(data[water_cols_to_fill[i - 1]])
 
-    elec_cols_to_fill = [
-        col
-        for col in data.columns
-        if col.startswith("Net_Elec") and not col.endswith("2022")
-    ]
-    for c in elec_cols_to_fill:
-        data[c].fillna(
-            data["Net_Electricity_Production_Electricity_GWh_2022"], inplace=True
-        )
+    elec_cols_to_fill = [col for col in data.columns if col.startswith("Net_Elec")]
+    elec_cols_to_fill = list(reversed(elec_cols_to_fill))  # Most recent first.
+    for i, c in enumerate(elec_cols_to_fill[1:]):
+        # Backfill from present to past in a cascade.
+        data[c] = data[c].fillna(data[elec_cols_to_fill[i - 1]])
 
     return data
 
