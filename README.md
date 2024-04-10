@@ -18,7 +18,7 @@ In this project, I present three poor models that were selected using exhaustive
 I used Python 3.12, but you could probably use an older version.
 Here's a starter script for Linux.
 
-```sh
+```shell
 # Create a virtual environment
 python3 -m venv ./venv
 
@@ -27,6 +27,12 @@ source ./venv/bin/activate
 
 # Install the requirements
 pip install -r requirements.txt
+```
+
+Next, unzip the data in the `data-raw/` directory. From project root:
+
+```shell
+unzip "./data-raw/*.zip" -d "./data-raw/csv"
 ```
 
 Now you can run the notebook and code in `src/`.
