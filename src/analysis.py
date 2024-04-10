@@ -16,6 +16,7 @@ from statsmodels.regression.linear_model import RegressionResults
 import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree
 from src.data import get_dataset, ARTIFACT_DIR
+from src.viz import plot_linear_regression
 
 IS_ECONOMICALLY_FREE_DEFAULT_THRESHOLD = 70  # p85
 
@@ -87,14 +88,16 @@ if __name__ == "__main__":
     data = get_dataset()
 
     # Change from 2022
-    _, linear_results = build_linear_econ_predictor(data)
-    print(linear_results.summary())
+    change_model, change_results = build_linear_econ_predictor(data)
+    print(change_results.summary())
+    plot_linear_regression(data, change_model, change_results, "Change_from_2022")
 
     # Govt Integrity
-    _, linear_results = build_linear_econ_predictor(
+    govt_model, govt_results = build_linear_econ_predictor(
         data, "Govt_Integrity ~ elec_delta_10_yr + WS_PPL_W_SM_2021:elec_delta_10_yr"
     )
-    print(linear_results.summary())
+    print(govt_results.summary())
+    plot_linear_regression(data, govt_model, govt_results, "Govt_Integrity")
 
     # Is this country very "economically free"?
     tree, _, _ = build_econ_classifier(data)

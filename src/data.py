@@ -151,7 +151,37 @@ def get_final_features(
     return feature_df
 
 
+def fill_na_2022(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    This will put our delta values over time to zero for missing data,
+    instead of 1.
+    :param data:
+    :return:
+    """
+    water_cols_to_fill = [
+        col
+        for col in data.columns
+        if col.startswith("WS_PPL") and not col.endswith("2022")
+    ]
+    for c in water_cols_to_fill:
+        data[c].fillna(data["WS_PPL_W_SM_2022"], inplace=True)
+
+    elec_cols_to_fill = [
+        col
+        for col in data.columns
+        if col.startswith("Net_Elec") and not col.endswith("2022")
+    ]
+    for c in elec_cols_to_fill:
+        data[c].fillna(
+            data["Net_Electricity_Production_Electricity_GWh_2022"], inplace=True
+        )
+
+    return data
+
+
 def with_multiyear_deltas(data: pd.DataFrame) -> pd.DataFrame:
+    data = fill_na_2022(data)
+
     data["water_delta_10_yr"] = (
         data["WS_PPL_W_SM_2022"] - data["WS_PPL_W_SM_2012"]
     ) / data["WS_PPL_W_SM_2022"]
